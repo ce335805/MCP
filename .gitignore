@@ -1,0 +1,11 @@
+CMakeFiles/
+CMakeLists.txt.user
+cmake_install.cmake
+
+written_stuff/
+
+batch_script.sh
+*.o
+*.pdf
+a.out
+MY_MCP
