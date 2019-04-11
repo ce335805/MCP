@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <assert.h>
-//#include "mkl.h"
-#include <cblas.h>
+#include "mkl.h"
 #include <chrono>
 #include <cmath>
 #include <fstream>
@@ -121,85 +120,7 @@ int main()
 
     prods_1 = std::vector<size_t>{ 0, 1, 2 };
     dimensions = std::vector<size_t>{ 3, 5, 3, 5, 3 };
-    compute_MC(prods_1, dimensions);
-
-    //    	std::cout << "dims are: " << "0.9N, N, 0.9N, N, 0.9N" << '\n';
-    //    	std::cout << '\n';
-    //
-    //        for(auto N = 100ul; N < 1500; N = N+100){
-    //
-    //    		std::cout << "N = " << N << '\n';
-    //
-    //            size_t M = static_cast<size_t>(0.9 * N);
-    //            dimensions = std::vector<size_t>{ M, N, M, N, M };
-    //
-    //    		matrix_chain(dimensions, costs, splits, flops);
-    //    		prods_1 = gen_prods(splits, 0);
-    //    	    prods_2 = find_best_MC(dimensions);
-    //
-    ////    		if(prods_1 == prods_2)
-    ////    			continue;
-    //
-    //    		double time1 {};
-    //    		double time2 {};
-    //    		int reps = 20;
-    //            for(auto r = 0; r < reps; ++r ){
-    //    			time1 += compute_MC(prods_1, dimensions);
-    //    			time2 += compute_MC(prods_2, dimensions);
-    //    		}
-    //
-    //    		std::cout << "rel. time diff. : " << (time1- time2)/time2 << '\n';
-    //
-    //    	    for (auto elem : prods_2)
-    //    	        std::cout << elem << '\t';
-    //    	    std::cout << '\n';
-    //    	    for (auto elem : prods_1)
-    //    	        std::cout << elem << '\t';
-    //    	    std::cout << '\n';
-
-    //    		print_matrix(splits);
-    //    		print_matrix(costs);
-    //    	}
-
-    //    std::ofstream output;
-    //    output.open("comparison_4_300_c");
-    //    for (auto i = 20ul; i < 301; i = i + 20) {
-    //        for (auto j = 20ul; j < 301; j = j + 20) {
-    //            for (auto k = 20ul; k < 301; k = k + 20) {
-    //                for (auto l = 20ul; l < 301; l = l + 20) {
-    //                    for (auto m = 20ul; m < 301; m = m + 20) {
-    //
-    //	                    //for (auto a = 1ul; a < 52; a = a + 10) {
-    //	                    //for (auto b = 1ul; b < 52; b = b + 10) {
-    //	                    //for (auto c = 1ul; c < 52; c = c + 10) {
-    //
-    //                        dimensions = std::vector<size_t>{ i, j, k, l, m };
-    //                        matrix_chain(dimensions, costs, splits, flops);
-    //                        prods_1 = gen_prods(splits, 0);
-    //                        prods_2 = find_best_MC(dimensions);
-    //                        if (prods_1 == prods_2)
-    //                            continue;
-    //                        else {
-    //                            double time_1{};
-    //                            double time_2{};
-    //                            for (auto rep = 0; rep < 20; ++rep) {
-    //                                time_1 += compute_MC(prods_1, dimensions);
-    //                                time_2 += compute_MC(prods_2, dimensions);
-    //                            }
-    //							//std::cout << (time_1 - time_2) / time_2 << '\n';
-    //                            if ((time_1 - time_2) / time_2 > 0.1 )
-    //                                print_to_file((time_1 - time_2) / time_2, dimensions, output);
-    //						}
-    //
-    //						//}
-    //						//}
-    //                        //}
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //    output.close();
+    //compute_MC(prods_1, dimensions);
 
     auto end = std::chrono::steady_clock::now();
 
@@ -270,8 +191,8 @@ double compute_MC(std::vector<size_t> products, std::vector<size_t> dimensions)
         matricies[i] = std::shared_ptr<double>(new double[dimensions[i] * dimensions[i + 1]]);
         for (auto k = 0; k < dimensions[i] * dimensions[i + 1]; ++k) {
             //initialize random matricies
-            //            matricies[i].get()[k] = uniform(generator);
-            matricies[i].get()[k] = 1.0;
+            matricies[i].get()[k] = uniform(generator);
+            //matricies[i].get()[k] = 1.0;
         }
     }
 
@@ -287,26 +208,6 @@ double compute_MC(std::vector<size_t> products, std::vector<size_t> dimensions)
         auto d1 = dimensions[products[i]];
         auto d2 = dimensions[products[i] + 1];
         auto d3 = dimensions[products[i] + 2];
-
-        //        std::cout << "d1 = " << d1 << " d2 = " << d2 << " d3 = " << d3 << '\n';
-
-        //        std::cout << "dims" << '\n';
-        //        for(auto elem: dimensions)
-        //                  std::cout << elem << '\t';
-        //                std::cout << '\n';
-
-        //        std::cout << "matricies" << '\n';
-        //        std::vector<double> to_print(d1 * d2, 0.0);
-        //        for (auto k = 0ul; k < d1 * d2; k++)
-        //            to_print[k] = matricies[0].get()[k];
-
-        //        std::cout << "matrix flat" << '\n';
-        //        for(auto elem: to_print)
-        //                  std::cout << elem << '\t';
-        //                std::cout << '\n';
-
-        //store intermediate result from multiplication
-        //double* temp = new double[d1 * d3];
 
         auto start = std::chrono::steady_clock::now();
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, d1, d3, d2, 1.0, matricies[products[i]].get(), d2, matricies[products[i] + 1].get(), d3, 0.0, temps[i].get(), d3);
